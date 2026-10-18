@@ -311,7 +311,7 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
     context.talentBonus = budget.bonus;
     context.grantedTalents = granted.map((t) => ({ name: t.name, img: t.img, from: t.from, uuid: t.uuid }));
 
-    // Heroic path through the bonus talent (only when the starting path is not heroic).
+    // Another heroic path through the bonus talent.
     context.bonusOffer = bonusPathAllowed(ancestry, path);
     if (context.bonusOffer) {
       const heroic = paths.filter((p) => p.pathType === "heroic" && p.uuid !== path?.uuid);
@@ -530,9 +530,8 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   static #onPath(event, target) {
     const uuid = target.dataset.uuid;
     this.draft.path = this.draft.path === uuid ? null : uuid;
-    // A heroic starting path makes the bonus heroic path unnecessary.
-    const entry = this.content.find(this.draft.path);
-    if (!entry || entry.pathType === "heroic" || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
+    // The bonus heroic path needs a starting path and must differ from it.
+    if (!this.draft.path || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
     this.focus = uuid;
     this.#commit();
   }

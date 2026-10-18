@@ -82,12 +82,24 @@ export function isHeroicBonus(rule, ancestryEntry) {
 }
 
 /**
- * A character whose starting path is not heroic (e.g. a Metalborn path) can
- * spend a heroic-only bonus talent on another heroic path's key talent,
- * gaining that heroic path. Radiant paths are never offered at creation.
+ * Level-1 bonus talents of an ancestry. The compendium Human ancestries ship
+ * with an empty `advancement.bonusTalents` (the bonus is only described in
+ * the text), so Human falls back to the book rule: one heroic bonus talent.
+ */
+export function levelOneBonusTalents(ancestryEntry) {
+  const listed = (ancestryEntry?.advancement?.bonusTalents ?? []).filter((b) => (b.level ?? 0) <= 1 && b.quantity);
+  if (listed.length) return listed;
+  if (String(ancestryEntry?.id ?? "").toLowerCase() === "human") return [{ level: 1, quantity: 1, restrictions: "" }];
+  return [];
+}
+
+/**
+ * A heroic-only bonus talent can be spent on another heroic path's key
+ * talent, gaining that path. This works with any starting path, heroic or
+ * not. Radiant paths are never offered at creation.
  */
 export function bonusPathAllowed(ancestryEntry, startingPath) {
-  if (!startingPath || startingPath.pathType === "heroic") return false;
+  if (!startingPath) return false;
   return talentBudget(ancestryEntry).heroicBonus > 0;
 }
 
@@ -143,8 +155,7 @@ export function talentBudget(ancestryEntry) {
   let heroicBonus = 0;
   let anyBonus = 0;
   const bonus = [];
-  for (const b of ancestryEntry?.advancement?.bonusTalents ?? []) {
-    if ((b.level ?? 0) > 1 || !b.quantity) continue;
+  for (const b of levelOneBonusTalents(ancestryEntry)) {
     const heroic = isHeroicBonus(b, ancestryEntry);
     if (heroic) heroicBonus += b.quantity;
     else anyBonus += b.quantity;
@@ -264,7 +275,7 @@ export function evaluate(draft, ctx) {
   }
   if (draft.bonusPath) {
     if (!ctx.bonusPath) error("talents", "Your bonus heroic path is not available in this world or era.");
-    else if (!bonusPathAllowed(ctx.ancestry, ctx.path)) error("talents", `${ctx.bonusPath.name} can only be taken with a heroic bonus talent when your starting path is not heroic.`);
+    else if (!bonusPathAllowed(ctx.ancestry, ctx.path)) error("talents", `${ctx.bonusPath.name} can only be taken with a heroic bonus talent from your ancestry.`);
     else if (ctx.bonusPath.uuid === ctx.path?.uuid) error("talents", "Your bonus heroic path must differ from your starting path.");
   }
   for (const uuid of draft.talents) {

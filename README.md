@@ -28,7 +28,7 @@ Drafts are saved per user, so closing the window does not lose progress. "Start 
 4. **Attributes**: 12 points, 0–3 each.
 5. **Skills**: 4 ranks, max rank 2 (granted ranks from your path are shown and counted toward the max).
 6. **Expertises**: cultural expertises come from your cultures, plus extra equal to Intellect.
-7. **Talents**: from your path and ancestry talent trees, with live prerequisite checks. Human bonus talents must come from a heroic path; with a Metalborn start, the bonus can open a second (heroic) path via its key talent.
+7. **Talents**: from your path and ancestry talent trees, with live prerequisite checks. Human bonus talents must come from a heroic path, and can open a second heroic path via its key talent (with any starting path, heroic or Metalborn).
 8. **Purpose, Obstacle, Goals, Connections**
 9. **Equipment**: starting kit (any item named "... Kit") plus extra gear.
 10. **Name & Portrait**
@@ -59,10 +59,11 @@ Items are added to the actor in book order (ancestry → cultures → starting p
 ## Human bonus talent and Metalborn starts
 
 - An ancestry bonus talent is treated as **heroic-only** when its restriction text mentions "heroic", or when the ancestry is Human.
+- The compendium Human ancestries list no bonus talents in their advancement data (the rule only lives in the description), so Human always gets one heroic bonus talent at level 1 unless its data says otherwise.
 - Heroic-only bonus talents can't be spent on Metalborn or ancestry trees; the wizard blocks it with an error.
-- If the starting path is **not** heroic (Misting, Mistborn, Feruchemist, Ferring, Twinborn), the Talents step offers a **Bonus Heroic Path** section: picking one spends the bonus talent on that path's key talent. The path item is added to the actor and its tree opens up below.
+- The Talents step offers a **Bonus Heroic Path** section for any starting path: picking one spends the bonus talent on another heroic path's key talent. The path item is added to the actor and its tree opens up below.
 - Key talents come from the path's grant-items event; if a path has none, the root node of its talent tree is used and added explicitly.
-- Switching to a heroic starting path, or to an ancestry without a heroic bonus, clears the bonus heroic path.
+- Clearing the starting path, choosing the bonus path as the starting path, or switching to an ancestry without a heroic bonus clears the bonus heroic path.
 
 ## Eras
 
