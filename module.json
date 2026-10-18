@@ -1,0 +1,55 @@
+{
+  "id": "character-creation-beautifier",
+  "title": "Character Creation Beautifier",
+  "description": "A guided, good-looking character creation wizard. Currently supports the Cosmere Roleplaying Game (Stormlight Handbook and Mistborn Handbook), with setting and era selection and rules-aware validation.",
+  "version": "0.2.0",
+  "authors": [
+    {
+      "name": "Lucas"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13.346",
+    "verified": "13.351",
+    "maximum": "13"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "cosmere-rpg",
+        "type": "system",
+        "compatibility": {
+          "minimum": "3.0.0"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "cosmere-rpg-stormlight-handbook",
+        "type": "module",
+        "reason": "Ancestries, cultures, heroic paths and talents for Roshar."
+      },
+      {
+        "id": "cosmere-rpg-mistborn-handbook",
+        "type": "module",
+        "reason": "Ancestries, cultures, heroic and Metalborn paths for Scadrial (both eras)."
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/ccb.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "url": "",
+  "manifest": "",
+  "download": ""
+}

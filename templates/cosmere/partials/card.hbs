@@ -1,0 +1,16 @@
+<article class="ccb-card {{#if selected}}selected{{/if}}" data-search="{{name}} {{summary}}">
+  <button type="button" class="ccb-card-hit" data-action="{{action}}" data-uuid="{{uuid}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+    <img class="ccb-card-img" src="{{img}}" alt="" loading="lazy">
+    <span class="ccb-card-text">
+      <span class="ccb-card-title">{{name}}</span>
+      {{#if subtitle}}<span class="ccb-card-sub">{{subtitle}}</span>{{/if}}
+      {{#if summary}}<span class="ccb-card-summary">{{summary}}</span>{{/if}}
+    </span>
+    <span class="ccb-check"><i class="fa-solid fa-check"></i></span>
+  </button>
+  <div class="ccb-card-foot">
+    <span class="ccb-badge src-{{source}}">{{sourceLabel}}</span>
+    {{#if eras}}<span class="ccb-badge">{{eras}}</span>{{/if}}
+    <button type="button" class="ccb-info" data-action="focus" data-uuid="{{uuid}}" data-tooltip="Read description"><i class="fa-solid fa-circle-info"></i></button>
+  </div>
+</article>

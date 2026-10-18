@@ -1,0 +1,32 @@
+<div class="ccb-budgets">{{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.goals}}</div>
+<div class="ccb-story">
+  <label class="ccb-field">
+    <span class="ccb-field-label"><i class="fa-solid fa-compass"></i> Purpose</span>
+    <span class="ccb-field-hint">Why does your hero do what they do?</span>
+    <textarea rows="3" data-bind="purpose" placeholder="To protect those who cannot protect themselves…">{{draft.purpose}}</textarea>
+  </label>
+  <label class="ccb-field">
+    <span class="ccb-field-label"><i class="fa-solid fa-mountain"></i> Obstacle</span>
+    <span class="ccb-field-hint">What stands in the way — within or without?</span>
+    <textarea rows="3" data-bind="obstacle" placeholder="I don't trust anyone with my past…">{{draft.obstacle}}</textarea>
+  </label>
+
+  <div class="ccb-field">
+    <span class="ccb-field-label"><i class="fa-solid fa-flag"></i> Goals</span>
+    {{#each goalFields}}
+    <input type="text" class="{{#if extra}}over{{/if}}" data-bind="goals.{{index}}" value="{{value}}" placeholder="Something your hero is working toward…">
+    {{/each}}
+  </div>
+
+  <div class="ccb-field">
+    <span class="ccb-field-label"><i class="fa-solid fa-handshake"></i> Connections</span>
+    {{#each connections}}
+    <div class="ccb-connection">
+      <input type="text" data-bind="connections.{{index}}.name" value="{{name}}" placeholder="Who?">
+      <input type="text" data-bind="connections.{{index}}.description" value="{{description}}" placeholder="How are you connected?">
+      <button type="button" class="ccb-icon-btn" data-action="removeConnection" data-index="{{index}}" aria-label="Remove connection"><i class="fa-solid fa-trash"></i></button>
+    </div>
+    {{/each}}
+    <button type="button" class="ccb-btn ghost small" data-action="addConnection"><i class="fa-solid fa-plus"></i> Add connection</button>
+  </div>
+</div>

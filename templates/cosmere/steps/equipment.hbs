@@ -1,0 +1,41 @@
+{{#if kits.length}}
+<h2 class="ccb-section">Starting Kit <small>choose one</small></h2>
+<div class="ccb-grid compact">
+  {{#each kits}}
+  <article class="ccb-card {{#if selected}}selected{{/if}}">
+    <button type="button" class="ccb-card-hit" data-action="kit" data-uuid="{{uuid}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+      <img class="ccb-card-img" src="{{img}}" alt=""><span class="ccb-card-text"><span class="ccb-card-title">{{name}}</span></span>
+      <span class="ccb-check"><i class="fa-solid fa-check"></i></span>
+    </button>
+    <div class="ccb-card-foot"><span class="ccb-badge src-{{source}}">{{sourceLabel}}</span>
+      <button type="button" class="ccb-info" data-action="focus" data-uuid="{{uuid}}"><i class="fa-solid fa-circle-info"></i></button></div>
+  </article>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if chosenGear.length}}
+<h2 class="ccb-section">Packed</h2>
+<div class="ccb-chips">
+  {{#each chosenGear}}<span class="ccb-chip"><img src="{{img}}" alt=""> {{name}}
+    <button type="button" data-action="gear" data-uuid="{{uuid}}" aria-label="Remove {{name}}"><i class="fa-solid fa-xmark"></i></button></span>{{/each}}
+</div>
+{{/if}}
+
+<h2 class="ccb-section">Extra Gear <small>with your GM's approval</small></h2>
+<input type="search" class="ccb-search" placeholder="Search items…" data-filter=".ccb-gear">
+<div class="ccb-gear">
+  {{#each gearGroups}}
+  <details class="ccb-gear-group" {{#if @first}}open{{/if}}>
+    <summary>{{label}} <small>{{items.length}}</small></summary>
+    <div class="ccb-gear-list">
+      {{#each items}}
+      <button type="button" class="ccb-gear-item {{#if selected}}selected{{/if}}" data-action="gear" data-uuid="{{uuid}}" data-search="{{name}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+        <img src="{{img}}" alt="" loading="lazy"> <span>{{name}}</span> <span class="ccb-badge src-{{source}}">{{sourceLabel}}</span>
+        <i class="fa-solid {{#if selected}}fa-check{{else}}fa-plus{{/if}}"></i>
+      </button>
+      {{/each}}
+    </div>
+  </details>
+  {{/each}}
+</div>

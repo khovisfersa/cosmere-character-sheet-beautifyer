@@ -1,0 +1,27 @@
+<aside class="ccb-sidebar">
+  <div class="ccb-brand">
+    <span class="ccb-sigil"><i class="fa-solid fa-feather-pointed"></i></span>
+    <div>
+      <div class="ccb-brand-title">{{#if draft.name}}{{draft.name}}{{else}}New Hero{{/if}}</div>
+      <div class="ccb-brand-sub">{{worldLabel}}</div>
+    </div>
+  </div>
+
+  <ol class="ccb-steps">
+    {{#each steps}}
+    <li>
+      <button type="button" class="ccb-step status-{{status}} {{#if active}}active{{/if}}" data-action="goStep" data-index="{{index}}">
+        <span class="ccb-step-icon"><i class="{{icon}}"></i></span>
+        <span class="ccb-step-label">{{label}}</span>
+        <span class="ccb-step-state" aria-hidden="true">
+          {{#if (eq status "error")}}<i class="fa-solid fa-circle-xmark"></i>
+          {{else if (eq status "warn")}}<i class="fa-solid fa-circle-exclamation"></i>
+          {{else}}<i class="fa-solid fa-circle-check"></i>{{/if}}
+        </span>
+      </button>
+    </li>
+    {{/each}}
+  </ol>
+
+  <button type="button" class="ccb-reset" data-action="reset"><i class="fa-solid fa-rotate-left"></i> Start over</button>
+</aside>

@@ -1,0 +1,18 @@
+{{#if noPaths}}<div class="ccb-empty">No starting paths are available for this world and era.</div>{{/if}}
+
+<h2 class="ccb-section">Heroic Paths <small>your starting path grants its key talent and a skill rank</small></h2>
+<div class="ccb-grid">
+  {{#each heroicPaths}}{{> "modules/character-creation-beautifier/templates/cosmere/partials/card.hbs" action="path"}}{{/each}}
+</div>
+
+{{#if investedStarting.length}}
+<h2 class="ccb-section">Invested Paths <small>start play with your powers</small></h2>
+{{#if metalbornHint}}
+<div class="ccb-callout"><i class="fa-solid fa-gift"></i>
+  <div>Starting on an Invested path? Your ancestry's bonus talent can be spent on a <strong>heroic path's key talent</strong>, so you begin with both. You'll pick it in the Talents step. Radiant paths only open up later in play.</div>
+</div>
+{{/if}}
+<div class="ccb-grid">
+  {{#each investedStarting}}{{> "modules/character-creation-beautifier/templates/cosmere/partials/card.hbs" action="path"}}{{/each}}
+</div>
+{{/if}}

@@ -1,0 +1,14 @@
+<div class="ccb-budgets">{{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.cultures}}</div>
+
+<h2 class="ccb-section">Ancestry <small>choose one</small></h2>
+{{#if noAncestries}}<div class="ccb-empty">No ancestries are available for this world and era.</div>{{/if}}
+<div class="ccb-grid">
+  {{#each ancestries}}{{> "modules/character-creation-beautifier/templates/cosmere/partials/card.hbs" action="ancestry"}}{{/each}}
+</div>
+
+<h2 class="ccb-section">Cultures <small>choose {{budgets.cultures.total}}</small></h2>
+<input type="search" class="ccb-search" placeholder="Search cultures…" data-filter=".ccb-culture-grid">
+{{#if noCultures}}<div class="ccb-empty">No cultures are available for this world and era.</div>{{/if}}
+<div class="ccb-grid ccb-culture-grid">
+  {{#each cultures}}{{> "modules/character-creation-beautifier/templates/cosmere/partials/card.hbs" action="culture"}}{{/each}}
+</div>

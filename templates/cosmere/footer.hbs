@@ -1,0 +1,21 @@
+<footer class="ccb-footer">
+  <button type="button" class="ccb-btn ghost" data-action="back" {{#if isFirst}}disabled{{/if}}>
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </button>
+
+  <div class="ccb-footer-status">
+    {{#if errorCount}}<span class="ccb-pill error"><i class="fa-solid fa-ban"></i> {{errorCount}} to fix</span>{{/if}}
+    {{#if warnCount}}<span class="ccb-pill warn"><i class="fa-solid fa-triangle-exclamation"></i> {{warnCount}} missing</span>{{/if}}
+    {{#unless errorCount}}{{#unless warnCount}}<span class="ccb-pill ok"><i class="fa-solid fa-circle-check"></i> All set</span>{{/unless}}{{/unless}}
+  </div>
+
+  {{#if isLast}}
+  <button type="button" class="ccb-btn primary" data-action="create" {{#if hasErrors}}disabled{{/if}} {{#if creating}}disabled{{/if}}>
+    {{#if creating}}<i class="fa-solid fa-spinner fa-spin"></i> Creating…{{else}}<i class="fa-solid fa-sparkles"></i> Create Character{{/if}}
+  </button>
+  {{else}}
+  <button type="button" class="ccb-btn primary" data-action="next" {{#if stepBlocked}}disabled data-tooltip="Fix the errors on this step first"{{/if}}>
+    Next <i class="fa-solid fa-arrow-right"></i>
+  </button>
+  {{/if}}
+</footer>

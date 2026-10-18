@@ -1,0 +1,61 @@
+<div class="ccb-budgets">{{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.talents}}</div>
+{{#each talentBonus}}<p class="ccb-hint"><i class="fa-solid fa-gift"></i> Your ancestry grants {{quantity}} bonus talent{{#if heroic}}, which must come from a heroic path{{/if}}{{#if restrictions}} ({{restrictions}}){{/if}}.</p>{{/each}}
+
+{{#if bonusOffer}}
+<h2 class="ccb-section">Bonus Heroic Path <small>spend your bonus talent on a heroic path's key talent</small></h2>
+<p class="ccb-hint">Your starting path isn't heroic, so your bonus talent can open one of the heroic paths below. Its talent tree then appears further down.</p>
+<div class="ccb-grid">
+  {{#each bonusPaths}}
+  <article class="ccb-card {{#if selected}}selected{{/if}} {{#if locked}}locked{{/if}}" data-search="{{name}}">
+    <button type="button" class="ccb-card-hit" data-action="bonusPath" data-uuid="{{uuid}}" {{#if locked}}disabled{{/if}} aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+      <img class="ccb-card-img" src="{{img}}" alt="" loading="lazy">
+      <span class="ccb-card-text">
+        <span class="ccb-card-title">{{name}}</span>
+        <span class="ccb-card-sub">{{subtitle}}</span>
+        {{#if summary}}<span class="ccb-card-summary">{{summary}}</span>{{/if}}
+      </span>
+      <span class="ccb-check"><i class="fa-solid fa-check"></i></span>
+    </button>
+    <div class="ccb-card-foot">
+      <span class="ccb-badge src-{{source}}">{{sourceLabel}}</span>
+      <button type="button" class="ccb-info" data-action="focus" data-uuid="{{uuid}}" data-tooltip="Read description"><i class="fa-solid fa-circle-info"></i></button>
+    </div>
+  </article>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if grantedTalents.length}}
+<h2 class="ccb-section">Already yours</h2>
+<div class="ccb-chips">
+  {{#each grantedTalents}}<button type="button" class="ccb-chip granted" data-action="focus" data-uuid="{{uuid}}"><img src="{{img}}" alt=""> {{name}} <small>{{from}}</small></button>{{/each}}
+</div>
+{{/if}}
+
+{{#if noTrees}}<div class="ccb-empty">Choose a starting path to see its talents.</div>{{/if}}
+
+{{#if talentGroups.length}}
+<input type="search" class="ccb-search" placeholder="Search talents…" data-filter=".ccb-talent-groups">
+{{/if}}
+<div class="ccb-talent-groups">
+  {{#each talentGroups}}
+  <section class="ccb-talent-group">
+    <h3>{{label}} <small>{{source}} · {{eligibleCount}} available</small></h3>
+    <div class="ccb-talents">
+      {{#each talents}}
+      <div class="ccb-talent {{#if picked}}picked{{/if}} {{#unless eligible}}ineligible{{/unless}}" data-search="{{name}} {{summary}}">
+        <button type="button" class="ccb-talent-hit" data-action="talent" data-uuid="{{uuid}}" {{#if locked}}disabled{{/if}} aria-pressed="{{#if picked}}true{{else}}false{{/if}}">
+          <img src="{{img}}" alt="" loading="lazy">
+          <span class="ccb-talent-text">
+            <span class="ccb-talent-name">{{name}}</span>
+            {{#if prereqs.length}}<span class="ccb-prereqs">{{#each prereqs}}<span class="ccb-prereq {{#if met}}met{{else}}unmet{{/if}} {{#if soft}}soft{{/if}}">{{label}}</span>{{/each}}</span>{{/if}}
+          </span>
+          <span class="ccb-check"><i class="fa-solid fa-check"></i></span>
+        </button>
+        <button type="button" class="ccb-info" data-action="focus" data-uuid="{{uuid}}" data-tooltip="Read description"><i class="fa-solid fa-circle-info"></i></button>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+  {{/each}}
+</div>

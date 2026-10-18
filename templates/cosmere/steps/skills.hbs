@@ -1,0 +1,21 @@
+<div class="ccb-budgets">{{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.skills}}</div>
+<p class="ccb-hint">No skill may exceed rank {{budgets.skills.max}} at level 1. <span class="ccb-legend"><span class="ccb-pip granted"></span> granted by your choices <span class="ccb-pip bought"></span> bought</span></p>
+
+<div class="ccb-skill-groups">
+  {{#each skillGroups}}
+  <section class="ccb-skill-group">
+    <h3>{{label}} <span class="ccb-score">{{score}}</span></h3>
+    {{#each skills}}
+    <div class="ccb-skill {{#if over}}over{{/if}}" {{#if grantedFrom}}data-tooltip="From {{grantedFrom}}"{{/if}}>
+      <span class="ccb-skill-name">{{label}}</span>
+      <span class="ccb-pips">{{#each pips}}<span class="ccb-pip {{#if granted}}granted{{else if bought}}bought{{/if}}"></span>{{/each}}</span>
+      <span class="ccb-skill-mod">+{{mod}}</span>
+      <span class="ccb-stepper small">
+        <button type="button" data-action="skill" data-key="{{key}}" data-delta="-1" {{#unless canDec}}disabled{{/unless}} aria-label="Decrease {{label}}"><i class="fa-solid fa-minus"></i></button>
+        <button type="button" data-action="skill" data-key="{{key}}" data-delta="1" {{#unless canInc}}disabled{{/unless}} aria-label="Increase {{label}}"><i class="fa-solid fa-plus"></i></button>
+      </span>
+    </div>
+    {{/each}}
+  </section>
+  {{/each}}
+</div>

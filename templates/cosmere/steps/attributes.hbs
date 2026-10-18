@@ -1,0 +1,26 @@
+<div class="ccb-budgets">
+  {{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.attributes}}
+  <div class="ccb-derived">
+    {{#each derived}}<span class="ccb-derived-item"><i class="{{icon}}"></i> {{label}} <strong>{{value}}</strong></span>{{/each}}
+  </div>
+</div>
+<p class="ccb-hint">Each attribute ranges from 0 to {{budgets.attributes.max}} at level 1.</p>
+
+<div class="ccb-attr-groups">
+  {{#each attributeGroups}}
+  <section class="ccb-attr-group group-{{id}}">
+    <h3>{{label}}</h3>
+    {{#each attributes}}
+    <div class="ccb-attr {{#if over}}over{{/if}}">
+      <div class="ccb-attr-name">{{label}}{{#if granted}} <span class="ccb-granted" data-tooltip="Granted by your choices">+{{granted}}</span>{{/if}}</div>
+      <div class="ccb-stepper">
+        <button type="button" data-action="attr" data-key="{{key}}" data-delta="-1" {{#unless canDec}}disabled{{/unless}} aria-label="Decrease {{label}}"><i class="fa-solid fa-minus"></i></button>
+        <span class="ccb-attr-value">{{total}}</span>
+        <button type="button" data-action="attr" data-key="{{key}}" data-delta="1" {{#unless canInc}}disabled{{/unless}} aria-label="Increase {{label}}"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="ccb-pips">{{#each pips}}<span class="ccb-pip {{#if filled}}on{{/if}}"></span>{{/each}}</div>
+    </div>
+    {{/each}}
+  </section>
+  {{/each}}
+</div>

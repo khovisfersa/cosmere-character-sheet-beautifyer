@@ -1,0 +1,36 @@
+<div class="ccb-budgets">{{> "modules/character-creation-beautifier/templates/cosmere/partials/budget.hbs" budgets.expertises}}</div>
+<p class="ccb-hint">Beyond the expertises from your cultures, you choose a number of expertises {{expertiseFormula}}.</p>
+
+<h2 class="ccb-section">From your origin</h2>
+<div class="ccb-chips">
+  {{#each grantedExpertises}}<span class="ccb-chip granted"><i class="fa-solid fa-lock"></i> {{label}} <small>{{type}}</small></span>{{/each}}
+  {{#unless grantedExpertises.length}}
+    {{#if cultureNames.length}}{{#each cultureNames}}<span class="ccb-chip granted"><i class="fa-solid fa-earth-americas"></i> {{this}} <small>cultural</small></span>{{/each}}
+    {{else}}<span class="ccb-muted">Choose your cultures to see your cultural expertises.</span>{{/if}}
+  {{/unless}}
+  {{#if expertisePicks}}<span class="ccb-chip prompt"><i class="fa-solid fa-hand-pointer"></i> {{expertisePicks}} more will be offered when the character is created</span>{{/if}}
+</div>
+
+<h2 class="ccb-section">Your choices</h2>
+<div class="ccb-chips">
+  {{#each chosenExpertises}}
+  <span class="ccb-chip">{{label}} <small>{{typeLabel}}</small>
+    <button type="button" data-action="removeExpertise" data-key="{{key}}" aria-label="Remove {{label}}"><i class="fa-solid fa-xmark"></i></button>
+  </span>
+  {{else}}<span class="ccb-muted">Nothing chosen yet.</span>
+  {{/each}}
+</div>
+
+<div class="ccb-expertise-picker">
+  <select data-expertise-type aria-label="Expertise type">
+    {{#each expertiseTypes}}<option value="{{id}}" {{#if first}}selected{{/if}}>{{label}}</option>{{/each}}
+  </select>
+  {{#each expertiseTypes}}
+  <select data-expertise-options="{{id}}" aria-label="{{label}} expertise" {{#unless first}}hidden{{/unless}} {{#unless hasOptions}}disabled{{/unless}}>
+    {{#if hasOptions}}<option value="">Choose…</option>{{#each options}}<option value="{{id}}">{{label}}</option>{{/each}}
+    {{else}}<option value="">Type a custom one →</option>{{/if}}
+  </select>
+  {{/each}}
+  <input type="text" data-expertise-custom placeholder="…or a custom expertise">
+  <button type="button" class="ccb-btn" data-action="addExpertise" {{#if budgets.expertises.done}}disabled{{/if}}><i class="fa-solid fa-plus"></i> Add</button>
+</div>

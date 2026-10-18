@@ -1,0 +1,47 @@
+{
+  "CCB": {
+    "Title": "Character Creation",
+    "OpenButton": "Create Character",
+    "Settings": {
+      "OpenOnCreate": {
+        "Name": "Replace the default \"Create Actor\" for characters",
+        "Hint": "When a player creates a new Character actor, open the creation wizard instead of a blank sheet."
+      },
+      "IncludeHomebrew": {
+        "Name": "Include homebrew content",
+        "Hint": "Also offer ancestries, cultures, paths and talents from world items and other modules' compendiums (always on for the \"Other\" setting)."
+      },
+      "MaxAttribute": {
+        "Name": "Maximum attribute score at creation",
+        "Hint": "No attribute may go above this value at level 1."
+      },
+      "CultureCount": {
+        "Name": "Cultures at creation",
+        "Hint": "How many cultures (cultural expertises) a new character takes."
+      },
+      "GoalCount": {
+        "Name": "Goals at creation",
+        "Hint": "How many goals a new character starts with."
+      },
+      "MinConnections": {
+        "Name": "Minimum connections at creation",
+        "Hint": "The wizard warns if a character has fewer connections than this."
+      },
+      "ExtraExpertises": {
+        "Name": "Additional expertises",
+        "Hint": "\"int\" to grant expertises equal to Intellect, or a fixed number."
+      },
+      "EraRules": {
+        "Name": "Era rules",
+        "Label": "Edit Era Rules",
+        "Hint": "Which Scadrial eras each path, specialty, ancestry, culture or talent belongs to."
+      }
+    },
+    "Notify": {
+      "NoSystem": "Character Creation Beautifier does not support this game system yet.",
+      "Created": "{name} is ready.",
+      "Failed": "Character creation failed. See the console (F12) for details.",
+      "Blocked": "Fix the errors marked in red before continuing."
+    }
+  }
+}

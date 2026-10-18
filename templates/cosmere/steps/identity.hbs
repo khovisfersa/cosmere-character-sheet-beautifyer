@@ -1,0 +1,16 @@
+<div class="ccb-identity">
+  <button type="button" class="ccb-portrait" data-action="portrait" data-tooltip="Choose portrait">
+    <img src="{{draft.img}}" alt="Portrait">
+    <span><i class="fa-solid fa-camera"></i> Change</span>
+  </button>
+  <div class="ccb-identity-fields">
+    <label class="ccb-field">
+      <span class="ccb-field-label">Name</span>
+      <input type="text" class="ccb-name" data-bind="name" value="{{draft.name}}" placeholder="Your hero's name">
+    </label>
+    <label class="ccb-field">
+      <span class="ccb-field-label">Appearance</span>
+      <textarea rows="6" data-bind="appearance" placeholder="Eyes, build, clothing, the scar they never explain…">{{draft.appearance}}</textarea>
+    </label>
+  </div>
+</div>

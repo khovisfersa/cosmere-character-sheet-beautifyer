@@ -1,0 +1,36 @@
+<div class="ccb-review">
+  <div class="ccb-review-hero">
+    <img src="{{review.img}}" alt="">
+    <div>
+      <div class="ccb-review-name">{{review.name}}</div>
+      <div class="ccb-review-line">{{review.ancestry}} · {{review.cultures}}</div>
+      <div class="ccb-review-line">{{review.path}}{{#if review.bonusPath}} + {{review.bonusPath}}{{/if}} · {{worldLabel}}</div>
+    </div>
+  </div>
+
+  <div class="ccb-review-attrs">
+    {{#each review.attributes}}<div class="ccb-review-attr"><span>{{value}}</span><label>{{label}}</label></div>{{/each}}
+  </div>
+
+  <div class="ccb-review-cols">
+    <section><h3>Skills</h3>{{#each review.skills}}<div class="ccb-kv"><span>{{label}}</span><strong>{{rank}}</strong></div>{{else}}<span class="ccb-muted">None</span>{{/each}}</section>
+    <section><h3>Expertises</h3>{{#each review.expertises}}<div>{{this}}</div>{{else}}<span class="ccb-muted">None</span>{{/each}}</section>
+    <section><h3>Talents</h3>{{#each review.talents}}<div>{{this}}</div>{{else}}<span class="ccb-muted">None</span>{{/each}}</section>
+    <section><h3>Goals & Connections</h3>{{#each review.goals}}<div><i class="fa-solid fa-flag"></i> {{this}}</div>{{/each}}{{#each review.connections}}<div><i class="fa-solid fa-handshake"></i> {{this}}</div>{{/each}}</section>
+  </div>
+
+  {{#if review.pickPrompts.length}}
+  <div class="ccb-callout"><i class="fa-solid fa-hand-pointer"></i><div>When the character is created, you'll be asked to make a choice for: <strong>{{#each review.pickPrompts}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</strong>.</div></div>
+  {{/if}}
+
+  {{#if allIssues.length}}
+  <h2 class="ccb-section">Checklist</h2>
+  <ul class="ccb-checklist">
+    {{#each allIssues}}
+    <li class="{{level}}"><i class="fa-solid {{#if isError}}fa-ban{{else}}fa-triangle-exclamation{{/if}}"></i> <strong>{{stepLabel}}</strong> {{text}}</li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <div class="ccb-callout ok"><i class="fa-solid fa-circle-check"></i><div>Everything checks out. Your hero is ready.</div></div>
+  {{/if}}
+</div>

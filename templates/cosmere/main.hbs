@@ -1,0 +1,46 @@
+<section class="ccb-main {{#if showDetail}}with-detail{{/if}}">
+  <header class="ccb-head">
+    <div class="ccb-kicker">Step {{stepNumber}} of {{stepCount}}</div>
+    <h1 class="ccb-title">{{step.title}}</h1>
+    <p class="ccb-lede">{{step.lede}}</p>
+    {{#if issues.length}}
+    <ul class="ccb-issues">
+      {{#each issues}}
+      <li class="ccb-issue {{level}}">
+        <i class="fa-solid {{#if (eq level 'error')}}fa-ban{{else}}fa-triangle-exclamation{{/if}}"></i> {{text}}
+      </li>
+      {{/each}}
+    </ul>
+    {{/if}}
+  </header>
+
+  <div class="ccb-body">
+    <div class="ccb-content">
+      {{> (lookup . "stepTemplate") }}
+    </div>
+
+    {{#if showDetail}}
+    <aside class="ccb-detail">
+      {{#if detail}}
+      <div class="ccb-detail-head">
+        <img src="{{detail.img}}" alt="">
+        <div>
+          <div class="ccb-detail-name">{{detail.name}}</div>
+          <div class="ccb-detail-meta">
+            <span class="ccb-badge src-{{detail.sourceKey}}">{{detail.source}}</span>
+            <span class="ccb-badge">{{detail.typeLabel}}</span>
+            {{#if detail.eras}}<span class="ccb-badge">{{detail.eras}}</span>{{/if}}
+          </div>
+        </div>
+      </div>
+      <div class="ccb-detail-body ccb-prose">{{{detail.html}}}</div>
+      {{else}}
+      <div class="ccb-detail-empty">
+        <i class="fa-solid fa-book-open"></i>
+        <p>Select a card or press <i class="fa-solid fa-circle-info"></i> to read its full description here.</p>
+      </div>
+      {{/if}}
+    </aside>
+    {{/if}}
+  </div>
+</section>

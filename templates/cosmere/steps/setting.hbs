@@ -1,0 +1,30 @@
+{{#if missingBooks.length}}
+<div class="ccb-callout warn"><i class="fa-solid fa-book"></i>
+  <div>No content found from: <strong>{{#each missingBooks}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</strong>. Check that the module is active{{#if hiddenPacks}} and that players have Observer access to its compendiums ({{hiddenPacks}} compendium(s) are hidden from you){{/if}}.</div>
+</div>
+{{/if}}
+
+<div class="ccb-worlds">
+  {{#each worlds}}
+  <button type="button" class="ccb-world world-{{id}} {{#if selected}}selected{{/if}}" data-action="world" data-id="{{id}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+    <span class="ccb-world-art"><i class="{{icon}}"></i></span>
+    <span class="ccb-world-name">{{label}}</span>
+    <span class="ccb-world-sub">{{subtitle}}</span>
+    <span class="ccb-world-blurb">{{blurb}}</span>
+    <span class="ccb-check"><i class="fa-solid fa-check"></i></span>
+  </button>
+  {{/each}}
+</div>
+
+{{#if showEras}}
+<h2 class="ccb-section">Era of Play {{#if eraOptional}}<small>optional — filters Scadrial content</small>{{/if}}</h2>
+<div class="ccb-eras">
+  {{#each eras}}
+  <button type="button" class="ccb-era {{#if selected}}selected{{/if}}" data-action="era" data-id="{{id}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">
+    <span class="ccb-era-label">{{label}}</span>
+    <span class="ccb-era-sub">{{subtitle}}</span>
+    <span class="ccb-era-blurb">{{blurb}}</span>
+  </button>
+  {{/each}}
+</div>
+{{/if}}
