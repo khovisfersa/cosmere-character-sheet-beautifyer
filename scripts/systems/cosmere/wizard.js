@@ -281,10 +281,11 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
 
   #ctxExpertises(context, grants, chosenCultures) {
     const d = this.draft;
-    context.grantedExpertises = grants.expertises;
+    const typeLabel = (type) => game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[type]?.label ?? type);
+    context.grantedExpertises = grants.expertises.map((e) => ({ ...e, typeLabel: typeLabel(e.type) }));
     context.cultureNames = chosenCultures.map((c) => c.name);
     context.expertisePicks = grants.expertisePicks;
-    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[e.type]?.label ?? e.type) }));
+    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: typeLabel(e.type) }));
     const taken = new Set([...grants.expertises, ...d.expertises].map((e) => `${e.type}:${e.id}`));
     context.expertiseTypes = Object.entries(CONFIG.COSMERE?.expertiseTypes ?? {}).map(([id, cfg], i) => {
       const registry = cfg.configRegistryKey ? CONFIG.COSMERE?.[cfg.configRegistryKey] ?? {} : {};
@@ -311,7 +312,7 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
     context.talentBonus = budget.bonus;
     context.grantedTalents = granted.map((t) => ({ name: t.name, img: t.img, from: t.from, uuid: t.uuid }));
 
-    // Heroic path through the bonus talent (only when the starting path is not heroic).
+    // Another heroic path through the bonus talent.
     context.bonusOffer = bonusPathAllowed(ancestry, path);
     if (context.bonusOffer) {
       const heroic = paths.filter((p) => p.pathType === "heroic" && p.uuid !== path?.uuid);
@@ -530,9 +531,8 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   static #onPath(event, target) {
     const uuid = target.dataset.uuid;
     this.draft.path = this.draft.path === uuid ? null : uuid;
-    // A heroic starting path makes the bonus heroic path unnecessary.
-    const entry = this.content.find(this.draft.path);
-    if (!entry || entry.pathType === "heroic" || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
+    // The bonus heroic path needs a starting path and must differ from it.
+    if (!this.draft.path || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
     this.focus = uuid;
     this.#commit();
   }

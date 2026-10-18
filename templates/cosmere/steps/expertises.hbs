@@ -3,7 +3,7 @@
 
 <h2 class="ccb-section">From your origin</h2>
 <div class="ccb-chips">
-  {{#each grantedExpertises}}<span class="ccb-chip granted"><i class="fa-solid fa-lock"></i> {{label}} <small>{{type}}</small></span>{{/each}}
+  {{#each grantedExpertises}}<span class="ccb-chip granted"><i class="fa-solid fa-lock"></i> {{label}} <small>{{typeLabel}}</small></span>{{/each}}
   {{#unless grantedExpertises.length}}
     {{#if cultureNames.length}}{{#each cultureNames}}<span class="ccb-chip granted"><i class="fa-solid fa-earth-americas"></i> {{this}} <small>cultural</small></span>{{/each}}
     {{else}}<span class="ccb-muted">Choose your cultures to see your cultural expertises.</span>{{/if}}
