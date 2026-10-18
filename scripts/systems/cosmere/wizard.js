@@ -281,10 +281,11 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
 
   #ctxExpertises(context, grants, chosenCultures) {
     const d = this.draft;
-    context.grantedExpertises = grants.expertises;
+    const typeLabel = (type) => game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[type]?.label ?? type);
+    context.grantedExpertises = grants.expertises.map((e) => ({ ...e, typeLabel: typeLabel(e.type) }));
     context.cultureNames = chosenCultures.map((c) => c.name);
     context.expertisePicks = grants.expertisePicks;
-    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[e.type]?.label ?? e.type) }));
+    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: typeLabel(e.type) }));
     const taken = new Set([...grants.expertises, ...d.expertises].map((e) => `${e.type}:${e.id}`));
     context.expertiseTypes = Object.entries(CONFIG.COSMERE?.expertiseTypes ?? {}).map(([id, cfg], i) => {
       const registry = cfg.configRegistryKey ? CONFIG.COSMERE?.[cfg.configRegistryKey] ?? {} : {};

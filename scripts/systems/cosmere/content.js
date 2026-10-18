@@ -308,7 +308,7 @@ export function readEventGrants(doc) {
         break;
       case "grant-expertises":
         if (h.pick) out.expertisePicks += Number(h.pickAmount ?? 1);
-        else out.expertises.push(...toArray(h.expertises).map((e) => ({ id: e.id, type: e.type, label: e.label })));
+        else out.expertises.push(...toArray(h.expertises).map((e) => ({ id: e.id, type: e.type, label: expertiseLabel(e) })));
         break;
       case "execute-macro":
         out.runsMacro = true;
@@ -316,6 +316,22 @@ export function readEventGrants(doc) {
     }
   }
   return out;
+}
+
+/**
+ * Display name of an expertise. Compendium items store localization keys
+ * (e.g. "COSMERE.Item.Culture.Type.Luthadel") as labels, so translate them,
+ * falling back to the system's expertise registry and then the id.
+ */
+export function expertiseLabel({ id, type, label }) {
+  const isKey = (s) => /^[\w-]+(\.[\w-]+)+$/.test(s);
+  const tr = (s) => (s && game.i18n.has(s) ? game.i18n.localize(s) : s);
+  const own = tr(label);
+  if (own && !isKey(own)) return own;
+  const registryKey = CONFIG.COSMERE?.expertiseTypes?.[type]?.configRegistryKey;
+  const registered = tr(registryKey ? CONFIG.COSMERE?.[registryKey]?.[id]?.label : null);
+  if (registered && !isKey(registered)) return registered;
+  return String(id ?? "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function normalizePrereq(p) {
