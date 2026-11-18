@@ -28,3 +28,20 @@ export function slugify(text) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/**
+ * Coerce anything to a finite number. Non-numeric input (undefined, null,
+ * "", "@level", NaN, {value: 2}) becomes the fallback, and is reported once
+ * in the console with a label so bad data can be traced.
+ */
+const _reported = new Set();
+export function num(value, fallback = 0, label = null) {
+  if (value && typeof value === "object" && "value" in value) value = value.value;
+  const n = typeof value === "string" && value.trim() === "" ? NaN : Number(value);
+  if (Number.isFinite(n)) return n;
+  if (label && value !== undefined && value !== null && !_reported.has(label)) {
+    _reported.add(label);
+    console.warn(`${MODULE_ID} | Non-numeric value for ${label}:`, value, `→ using ${fallback}`);
+  }
+  return fallback;
+}

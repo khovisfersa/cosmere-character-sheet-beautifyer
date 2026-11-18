@@ -6,7 +6,7 @@
  * Each entry is tagged with a source (core / roshar / scadrial / homebrew)
  * and the Scadrial eras it is legal in.
  */
-import { MODULE_ID, toArray, plainText } from "../../constants.js";
+import { MODULE_ID, toArray, plainText, num } from "../../constants.js";
 import { getSetting } from "./settings.js";
 
 export const PACKAGE_SOURCES = {
@@ -301,14 +301,20 @@ export function readEventGrants(doc) {
         else out.items.push(...toArray(h.items).map((i) => i.uuid));
         break;
       case "modify-skill-rank":
-        if (h.skill && h.amount) out.skills.push({ skill: h.skill, amount: Number(h.amount) });
+        if (h.skill) {
+          const amount = num(h.amount, 0, `${doc.name} › modify-skill-rank (${h.skill})`);
+          if (amount) out.skills.push({ skill: h.skill, amount });
+        }
         break;
       case "modify-attribute":
-        if (h.attribute && h.amount && !h.bonus) out.attributes.push({ attribute: h.attribute, amount: Number(h.amount) });
+        if (h.attribute && !h.bonus) {
+          const amount = num(h.amount, 0, `${doc.name} › modify-attribute (${h.attribute})`);
+          if (amount) out.attributes.push({ attribute: h.attribute, amount });
+        }
         break;
       case "grant-expertises":
         if (h.pick) out.expertisePicks += Number(h.pickAmount ?? 1);
-        else out.expertises.push(...toArray(h.expertises).map((e) => ({ id: e.id, type: e.type, label: expertiseLabel(e) })));
+        else out.expertises.push(...toArray(h.expertises).map((e) => ({ id: e.id, type: e.type, label: e.label })));
         break;
       case "execute-macro":
         out.runsMacro = true;
@@ -316,22 +322,6 @@ export function readEventGrants(doc) {
     }
   }
   return out;
-}
-
-/**
- * Display name of an expertise. Compendium items store localization keys
- * (e.g. "COSMERE.Item.Culture.Type.Luthadel") as labels, so translate them,
- * falling back to the system's expertise registry and then the id.
- */
-export function expertiseLabel({ id, type, label }) {
-  const isKey = (s) => /^[\w-]+(\.[\w-]+)+$/.test(s);
-  const tr = (s) => (s && game.i18n.has(s) ? game.i18n.localize(s) : s);
-  const own = tr(label);
-  if (own && !isKey(own)) return own;
-  const registryKey = CONFIG.COSMERE?.expertiseTypes?.[type]?.configRegistryKey;
-  const registered = tr(registryKey ? CONFIG.COSMERE?.[registryKey]?.[id]?.label : null);
-  if (registered && !isKey(registered)) return registered;
-  return String(id ?? "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function normalizePrereq(p) {

@@ -2,7 +2,7 @@
   "id": "character-creation-beautifier",
   "title": "Character Creation Beautifier",
   "description": "A guided, good-looking character creation wizard. Currently supports the Cosmere Roleplaying Game (Stormlight Handbook and Mistborn Handbook), with setting and era selection and rules-aware validation.",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "authors": [
     {
       "name": "Lucas"

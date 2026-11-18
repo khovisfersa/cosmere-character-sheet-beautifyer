@@ -9,7 +9,7 @@
     <div class="ccb-skill {{#if over}}over{{/if}}" {{#if grantedFrom}}data-tooltip="From {{grantedFrom}}"{{/if}}>
       <span class="ccb-skill-name">{{label}}</span>
       <span class="ccb-pips">{{#each pips}}<span class="ccb-pip {{#if granted}}granted{{else if bought}}bought{{/if}}"></span>{{/each}}</span>
-      <span class="ccb-skill-mod">+{{mod}}</span>
+      <span class="ccb-skill-mod">+{{modifier}}</span>
       <span class="ccb-stepper small">
         <button type="button" data-action="skill" data-key="{{key}}" data-delta="-1" {{#unless canDec}}disabled{{/unless}} aria-label="Decrease {{label}}"><i class="fa-solid fa-minus"></i></button>
         <button type="button" data-action="skill" data-key="{{key}}" data-delta="1" {{#unless canInc}}disabled{{/unless}} aria-label="Increase {{label}}"><i class="fa-solid fa-plus"></i></button>

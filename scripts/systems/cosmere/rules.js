@@ -7,6 +7,7 @@
  *               character creation are blocked until it is fixed.
  */
 import { getSetting } from "./settings.js";
+import { num } from "../../constants.js";
 import { SETTINGS } from "./content.js";
 
 export const STEPS = [
@@ -51,13 +52,29 @@ export function blankDraft() {
 }
 
 /** Level-1 advancement rule from the system config. */
+const RULE_DEFAULTS = { attributePoints: 12, skillRanks: 4, maxSkillRanks: 2, talents: 1, health: 10 };
+
 export function levelOneRule() {
-  const rules = CONFIG.COSMERE?.advancement?.rules ?? [];
-  return foundry.utils.mergeObject(
-    { attributePoints: 12, skillRanks: 4, maxSkillRanks: 2, talents: 1 },
-    rules[0] ?? {},
-    { inplace: false },
-  );
+  const raw = CONFIG.COSMERE?.advancement?.rules;
+  const list = Array.isArray(raw) ? raw : Object.values(raw ?? {});
+  const first = list.find((r) => num(r?.level, 0) === 1) ?? list[0] ?? {};
+  const rule = { ...RULE_DEFAULTS, ...first };
+  for (const [k, d] of Object.entries(RULE_DEFAULTS)) rule[k] = num(rule[k], d, `level-1 rule ${k}`);
+  return rule;
+}
+
+/** Make a saved draft safe: every attribute and skill value becomes a finite number. */
+export function sanitizeDraft(draft) {
+  const attrs = {};
+  for (const k of ATTRIBUTE_KEYS) attrs[k] = Math.max(0, num(draft.attributes?.[k], 0, `draft attribute ${k}`));
+  draft.attributes = attrs;
+  const skills = {};
+  for (const [k, v] of Object.entries(draft.skills ?? {})) {
+    const n = Math.max(0, num(v, 0, `draft skill ${k}`));
+    if (n) skills[k] = n;
+  }
+  draft.skills = skills;
+  return draft;
 }
 
 /** Which path types are legal as a starting path for a world. */
@@ -82,24 +99,12 @@ export function isHeroicBonus(rule, ancestryEntry) {
 }
 
 /**
- * Level-1 bonus talents of an ancestry. The compendium Human ancestries ship
- * with an empty `advancement.bonusTalents` (the bonus is only described in
- * the text), so Human falls back to the book rule: one heroic bonus talent.
- */
-export function levelOneBonusTalents(ancestryEntry) {
-  const listed = (ancestryEntry?.advancement?.bonusTalents ?? []).filter((b) => (b.level ?? 0) <= 1 && b.quantity);
-  if (listed.length) return listed;
-  if (String(ancestryEntry?.id ?? "").toLowerCase() === "human") return [{ level: 1, quantity: 1, restrictions: "" }];
-  return [];
-}
-
-/**
- * A heroic-only bonus talent can be spent on another heroic path's key
- * talent, gaining that path. This works with any starting path, heroic or
- * not. Radiant paths are never offered at creation.
+ * A character whose starting path is not heroic (e.g. a Metalborn path) can
+ * spend a heroic-only bonus talent on another heroic path's key talent,
+ * gaining that heroic path. Radiant paths are never offered at creation.
  */
 export function bonusPathAllowed(ancestryEntry, startingPath) {
-  if (!startingPath) return false;
+  if (!startingPath || startingPath.pathType === "heroic") return false;
   return talentBudget(ancestryEntry).heroicBonus > 0;
 }
 
@@ -119,11 +124,11 @@ export function collectGrants(entries) {
     if (!entry) continue;
     const g = entry.grants;
     for (const { skill, amount } of g.skills) {
-      skills[skill] = (skills[skill] ?? 0) + amount;
+      skills[skill] = num(skills[skill]) + num(amount);
       (sources.skills[skill] ??= []).push(entry.name);
     }
     for (const { attribute, amount } of g.attributes) {
-      attributes[attribute] = (attributes[attribute] ?? 0) + amount;
+      attributes[attribute] = num(attributes[attribute]) + num(amount);
       (sources.attributes[attribute] ??= []).push(entry.name);
     }
     expertises.push(...g.expertises.map((e) => ({ ...e, from: entry.name })));
@@ -134,7 +139,7 @@ export function collectGrants(entries) {
     if (isStartingPath) {
       const skill = CONFIG.COSMERE?.startingSkills?.[entry.id];
       if (skill && !g.skills.some((s) => s.skill === skill)) {
-        skills[skill] = (skills[skill] ?? 0) + 1;
+        skills[skill] = num(skills[skill]) + 1;
         (sources.skills[skill] ??= []).push(`${entry.name} (starting path)`);
       }
     }
@@ -155,7 +160,8 @@ export function talentBudget(ancestryEntry) {
   let heroicBonus = 0;
   let anyBonus = 0;
   const bonus = [];
-  for (const b of levelOneBonusTalents(ancestryEntry)) {
+  for (const b of ancestryEntry?.advancement?.bonusTalents ?? []) {
+    if ((b.level ?? 0) > 1 || !b.quantity) continue;
     const heroic = isHeroicBonus(b, ancestryEntry);
     if (heroic) heroicBonus += b.quantity;
     else anyBonus += b.quantity;
@@ -275,7 +281,7 @@ export function evaluate(draft, ctx) {
   }
   if (draft.bonusPath) {
     if (!ctx.bonusPath) error("talents", "Your bonus heroic path is not available in this world or era.");
-    else if (!bonusPathAllowed(ctx.ancestry, ctx.path)) error("talents", `${ctx.bonusPath.name} can only be taken with a heroic bonus talent from your ancestry.`);
+    else if (!bonusPathAllowed(ctx.ancestry, ctx.path)) error("talents", `${ctx.bonusPath.name} can only be taken with a heroic bonus talent when your starting path is not heroic.`);
     else if (ctx.bonusPath.uuid === ctx.path?.uuid) error("talents", "Your bonus heroic path must differ from your starting path.");
   }
   for (const uuid of draft.talents) {

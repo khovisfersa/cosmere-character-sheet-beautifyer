@@ -1,13 +1,13 @@
 /**
  * The Cosmere character creation wizard (ApplicationV2).
  */
-import { MODULE_ID, TEMPLATE_ROOT, toArray, slugify } from "../../constants.js";
+import { MODULE_ID, TEMPLATE_ROOT, toArray, slugify, num } from "../../constants.js";
 import { getSetting, ERAS } from "./settings.js";
 import { ContentIndex, SETTINGS } from "./content.js";
 import {
   STEPS, ATTRIBUTE_KEYS, blankDraft, levelOneRule, evaluate, collectGrants,
   startingPathAllowed, bonusPathAllowed, talentBudget, prereqStatus,
-  extraExpertiseBudget, attrLabel, skillLabel,
+  extraExpertiseBudget, attrLabel, skillLabel, sanitizeDraft,
 } from "./rules.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -58,9 +58,9 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   constructor(options = {}) {
     super(options);
     const saved = game.user.getFlag(MODULE_ID, DRAFT_FLAG);
-    this.draft = foundry.utils.mergeObject(blankDraft(), saved ?? {}, { inplace: false });
+    this.draft = sanitizeDraft(foundry.utils.mergeObject(blankDraft(), saved ?? {}, { inplace: false }));
     if (options.name && !this.draft.name) this.draft.name = options.name;
-    this.stepIndex = saved?._step ?? 0;
+    this.stepIndex = Math.clamp(num(saved?._step, 0), 0, STEPS.length - 1);
     this.content = new ContentIndex();
     this.focus = null;
     this.enriched = new Map();
@@ -230,8 +230,8 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
       id: gid,
       label: game.i18n.localize(g.label ?? gid),
       attributes: toArray(g.attributes).map((k) => {
-        const value = d.attributes[k] ?? 0;
-        const granted = grants.attributes[k] ?? 0;
+        const value = num(d.attributes[k]);
+        const granted = num(grants.attributes[k]);
         return {
           key: k, label: attrLabel(k), value, granted, total: value + granted,
           pips: Array.from({ length: b.max }, (_, i) => ({ filled: i < value })),
@@ -257,15 +257,18 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
     const linked = new Set(entries.filter(Boolean).flatMap((e) => e.linkedSkills ?? []));
     const skills = CONFIG.COSMERE?.skills ?? {};
     const byAttr = {};
+    const attrScore = (k) => num(d.attributes[k]) + num(grants.attributes[k]);
     for (const [key, cfg] of Object.entries(skills)) {
-      const granted = grants.skills[key] ?? 0;
+      // Skills registered without a valid attribute can't be placed in a group.
+      if (!ATTRIBUTE_KEYS.includes(cfg?.attribute)) continue;
+      const granted = num(grants.skills[key]);
       if (!cfg.core && !granted && !linked.has(key)) continue;
-      const bought = d.skills[key] ?? 0;
+      const bought = num(d.skills[key]);
       const total = bought + granted;
-      const attrTotal = (d.attributes[cfg.attribute] ?? 0) + (grants.attributes[cfg.attribute] ?? 0);
+      const attrTotal = attrScore(cfg.attribute);
       (byAttr[cfg.attribute] ??= []).push({
         key, label: skillLabel(key), bought, granted, total,
-        mod: attrTotal + total,
+        modifier: attrTotal + total,
         grantedFrom: (grants.sources.skills[key] ?? []).join(", "),
         pips: Array.from({ length: b.max }, (_, i) => ({ granted: i < granted, bought: i >= granted && i < total })),
         canInc: total < b.max && b.spent < b.total,
@@ -274,18 +277,17 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
       });
     }
     context.skillGroups = ATTRIBUTE_KEYS.filter((k) => byAttr[k]).map((k) => ({
-      key: k, label: attrLabel(k), score: (d.attributes[k] ?? 0) + (grants.attributes[k] ?? 0), skills: byAttr[k],
+      key: k, label: attrLabel(k), score: attrScore(k), skills: byAttr[k],
     }));
     context.remaining = b.total - b.spent;
   }
 
   #ctxExpertises(context, grants, chosenCultures) {
     const d = this.draft;
-    const typeLabel = (type) => game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[type]?.label ?? type);
-    context.grantedExpertises = grants.expertises.map((e) => ({ ...e, typeLabel: typeLabel(e.type) }));
+    context.grantedExpertises = grants.expertises;
     context.cultureNames = chosenCultures.map((c) => c.name);
     context.expertisePicks = grants.expertisePicks;
-    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: typeLabel(e.type) }));
+    context.chosenExpertises = d.expertises.map((e) => ({ ...e, key: `${e.type}:${e.id}`, typeLabel: game.i18n.localize(CONFIG.COSMERE?.expertiseTypes?.[e.type]?.label ?? e.type) }));
     const taken = new Set([...grants.expertises, ...d.expertises].map((e) => `${e.type}:${e.id}`));
     context.expertiseTypes = Object.entries(CONFIG.COSMERE?.expertiseTypes ?? {}).map(([id, cfg], i) => {
       const registry = cfg.configRegistryKey ? CONFIG.COSMERE?.[cfg.configRegistryKey] ?? {} : {};
@@ -293,7 +295,7 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
         .map(([oid, o]) => ({ id: oid, label: game.i18n.localize(o?.label ?? oid) }))
         .filter((o) => !taken.has(`${id}:${o.id}`))
         .sort((a, b) => a.label.localeCompare(b.label));
-      return { id, label: game.i18n.localize(cfg.label), icon: cfg.icon, options, hasOptions: options.length > 0, first: i === 0 };
+      return { id, label: game.i18n.localize(cfg.label), icon: cfg.icon, options, hasOptions: options.length > 0, isFirst: i === 0 };
     });
     context.expertiseBudget = extraExpertiseBudget(d, grants);
     context.expertiseFormula = String(getSetting("extraExpertises")).toLowerCase() === "int" ? "equal to your Intellect" : "set by your GM";
@@ -312,7 +314,7 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
     context.talentBonus = budget.bonus;
     context.grantedTalents = granted.map((t) => ({ name: t.name, img: t.img, from: t.from, uuid: t.uuid }));
 
-    // Another heroic path through the bonus talent.
+    // Heroic path through the bonus talent (only when the starting path is not heroic).
     context.bonusOffer = bonusPathAllowed(ancestry, path);
     if (context.bonusOffer) {
       const heroic = paths.filter((p) => p.pathType === "heroic" && p.uuid !== path?.uuid);
@@ -531,8 +533,9 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   static #onPath(event, target) {
     const uuid = target.dataset.uuid;
     this.draft.path = this.draft.path === uuid ? null : uuid;
-    // The bonus heroic path needs a starting path and must differ from it.
-    if (!this.draft.path || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
+    // A heroic starting path makes the bonus heroic path unnecessary.
+    const entry = this.content.find(this.draft.path);
+    if (!entry || entry.pathType === "heroic" || this.draft.bonusPath === this.draft.path) this.draft.bonusPath = null;
     this.focus = uuid;
     this.#commit();
   }
@@ -547,10 +550,11 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   static #onAttr(event, target) {
     const { key, delta } = target.dataset;
     const b = this.result.budgets.attributes;
-    const cur = this.draft.attributes[key] ?? 0;
-    const next = cur + Number(delta);
-    if (next < 0) return;
-    if (Number(delta) > 0 && (next > b.max || b.spent >= b.total)) return;
+    const cur = num(this.draft.attributes[key]);
+    const step = num(delta);
+    const next = cur + step;
+    if (!step || next < 0) return;
+    if (step > 0 && (next > b.max || b.spent >= b.total)) return;
     this.draft.attributes[key] = next;
     this.#commit();
   }
@@ -558,10 +562,11 @@ export class CosmereCreationWizard extends HandlebarsApplicationMixin(Applicatio
   static #onSkill(event, target) {
     const { key, delta } = target.dataset;
     const b = this.result.budgets.skills;
-    const cur = this.draft.skills[key] ?? 0;
-    const next = cur + Number(delta);
-    if (next < 0) return;
-    if (Number(delta) > 0 && b.spent >= b.total) return;
+    const step = num(delta);
+    const cur = num(this.draft.skills[key]);
+    const next = cur + step;
+    if (!step || next < 0) return;
+    if (step > 0 && b.spent >= b.total) return;
     this.draft.skills[key] = next;
     if (!next) delete this.draft.skills[key];
     this.#commit();
